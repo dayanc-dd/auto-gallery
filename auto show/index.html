@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Auto Gallery | Premium Collection</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-main: #f4f5f7;
+            --bg-card: #ffffff;
+            --text-primary: #111827;
+            --text-secondary: #6b7280;
+            --accent: #2563eb;
+            --accent-hover: #1d4ed8;
+            --border: #e5e7eb;
+            --card-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.01);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-main);
+            color: var(--text-primary);
+            line-height: 1.5;
+            padding-bottom: 60px;
+        }
+
+        header {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            border-bottom: 1px solid var(--border);
+            padding: 1rem 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-weight: 700;
+            font-size: 1.25rem;
+            letter-spacing: -0.025em;
+            color: var(--text-primary);
+        }
+
+        .lang-switch {
+            background: #e5e7eb;
+            border: none;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .lang-switch:hover {
+            background: #d1d5db;
+        }
+
+        .hero {
+            max-width: 1200px;
+            margin: 3rem auto 2rem;
+            padding: 0 1.5rem;
+            text-align: center;
+        }
+
+        .hero h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            letter-spacing: -0.03em;
+        }
+
+        .hero p {
+            color: var(--text-secondary);
+            font-size: 1.125rem;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1.5rem;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .card {
+            background: var(--bg-card);
+            border-radius: 16px;
+            overflow: hidden;
+            border: 1px solid var(--border);
+            box-shadow: var(--card-shadow);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            cursor: pointer;
+        }
+
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+
+        .card-img {
+            width: 100%;
+            aspect-ratio: 1/1;
+            object-fit: cover;
+            display: block;
+            background-color: #000000;
+        }
+
+        .card-body {
+            padding: 1.25rem;
+        }
+
+        .card-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .card-sub {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+
+        .btn-details {
+            width: 100%;
+            background: #f3f4f6;
+            color: var(--text-primary);
+            border: none;
+            padding: 10px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s, color 0.2s;
+        }
+
+        .card:hover .btn-details {
+            background: var(--accent);
+            color: #ffffff;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(4px);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            padding: 1rem;
+        }
+
+        .modal-content {
+            background: #ffffff;
+            border-radius: 20px;
+            max-width: 600px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+            animation: fadeIn 0.2s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: rgba(0,0,0,0.5);
+            color: white;
+            border: none;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            font-size: 1.2rem;
+            cursor: pointer;
+            z-index: 10;
+        }
+
+        .modal-img {
+            width: 100%;
+            aspect-ratio: 1/1;
+            object-fit: contain;
+            background-color: #000000;
+        }
+
+        .modal-body {
+            padding: 1.5rem;
+        }
+
+        .modal-specs {
+            margin: 1rem 0;
+            border-top: 1px solid var(--border);
+            border-bottom: 1px solid var(--border);
+            padding: 1rem 0;
+        }
+
+        .spec-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+            font-size: 0.95rem;
+        }
+
+        .spec-label { color: var(--text-secondary); }
+        .spec-val { font-weight: 600; }
+
+        .btn-contact {
+            display: block;
+            width: 100%;
+            text-align: center;
+            background: var(--accent);
+            color: white;
+            padding: 12px;
+            border-radius: 10px;
+            text-decoration: none;
+            font-weight: 600;
+            margin-top: 1rem;
+        }
+
+        .btn-contact:hover {
+            background: var(--accent-hover);
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 4rem;
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="logo">AUTO GALLERY</div>
+        <button class="lang-switch" id="langBtn" onclick="toggleLanguage()">TM</button>
+    </header>
+
+    <section class="hero">
+        <h1 id="heroTitle">Exclusive Vehicle Collection</h1>
+        <p id="heroSub">Explore premium automobiles with detailed specifications</p>
+    </section>
+
+    <div class="container">
+        <div class="grid" id="carGrid"></div>
+    </div>
+
+    <div class="modal" id="carModal">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeModal()">&times;</button>
+            <img class="modal-img" id="modalImg" src="" alt="">
+            <div class="modal-body">
+                <h2 id="modalTitle"></h2>
+                <div class="modal-specs" id="modalSpecs"></div>
+                <p id="modalDesc" style="color: var(--text-secondary); font-size: 0.95rem;"></p>
+                <a href="tel:+99371305949" class="btn-contact" id="contactBtn">Call +993 71 305949</a>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <p>© 2026 Auto Gallery. All rights reserved.</p>
+    </footer>
+
+    <script>
+        var currentLang = 'en';
+
+        var cars = [
+            {
+                id: 1,
+                name: "Toyota Camry",
+                model: "XV30",
+                year: "2005",
+                img: "img/camry-xv30.jpg",
+                specs: {
+                    engine: "2.4L VVT-i",
+                    transmission: "Automatic",
+                    drive: "FWD",
+                    color: "White"
+                },
+                desc_en: "Classic reliable sedan in pristine condition, smooth automatic transmission, and immaculate interior.",
+                desc_tm: "Arassa ýagdaýdaky nusgawy sedan, ýumşak awtomat karobka, arassa salon."
+            },
+            {
+                id: 2,
+                name: "Kia K5",
+                model: "DL3",
+                year: "2021",
+                img: "img/kia-k5.jpg",
+                specs: {
+                    engine: "2.0L / 2.5L GDI",
+                    transmission: "Automatic 8-speed",
+                    drive: "FWD",
+                    color: "White"
+                },
+                desc_en: "Modern business-class sedan with dynamic styling, advanced tech, and ultimate comfort.",
+                desc_tm: "Döwrebap biznes-klass sedan, dinamiki dizaýn, öňdebaryjy tehnologiýalar we ýokary komfort."
+            },
+            {
+                id: 3,
+                name: "Toyota Yaris",
+                model: "XP150",
+                year: "2020",
+                img: "img/toyota-yaris.jpg",
+                specs: {
+                    engine: "1.5L Dual VVT-i",
+                    transmission: "CVT",
+                    drive: "FWD",
+                    color: "White"
+                },
+                desc_en: "Compact and fuel-efficient urban sedan with modern design and high reliability.",
+                desc_tm: "Şäher üçin amatly, tyşsyz we ygtybarly ykjam sedan."
+            },
+            {
+                id: 4,
+                name: "Hyundai Elantra",
+                model: "AD Facelift",
+                year: "2019",
+                img: "img/hyundai-elantra.jpg",
+                specs: {
+                    engine: "2.0L MPI",
+                    transmission: "Automatic",
+                    drive: "FWD",
+                    color: "White"
+                },
+                desc_en: "Stylish sedan equipped with custom LED running lights and smooth driving dynamics.",
+                desc_tm: "Aýratyn LED çyralary we ýumşak sürüşli stilny sedan."
+            },
+            {
+                id: 5,
+                name: "Toyota Land Cruiser 100",
+                model: "VXR",
+                year: "2006",
+                img: "img/lc100-vxr.jpg",
+                specs: {
+                    engine: "4.7L V8",
+                    transmission: "Automatic 4WD",
+                    drive: "Full-Time 4WD",
+                    color: "White"
+                },
+                desc_en: "Legendary off-road SUV ready for any terrain, maximum durability and comfort.",
+                desc_tm: "Islendik ýola taýýar rowaýaty ýolsuzlyk awtoulagy, maksimum berklik we komfort."
+            },
+            {
+                id: 6,
+                name: "Toyota Camry",
+                model: "XV80",
+                year: "2025",
+                img: "img/camry-xv80.jpg",
+                specs: {
+                    engine: "2.5L Hybrid / HEV",
+                    transmission: "e-CVT",
+                    drive: "FWD",
+                    color: "White"
+                },
+                desc_en: "Next-generation flagship sedan with cutting-edge hybrid drive and luxury finish.",
+                desc_tm: "Täze nesil flagman sedan, iň soňky gibrid ulgamy we lýuks salon."
+            }
+        ];
+
+        var translations = {
+            en: {
+                heroTitle: "Exclusive Vehicle Collection",
+                heroSub: "Explore premium automobiles with detailed specifications",
+                btnText: "View Details",
+                callBtn: "Call +993 71 305949",
+                engine: "Engine",
+                trans: "Transmission",
+                drive: "Drive",
+                color: "Color",
+                year: "Year"
+            },
+            tm: {
+                heroTitle: "Eksklýuziw Awtoulag Ulgamy",
+                heroSub: "Giňişleýin häsiýetnamaly premium awtoulaglar bilen tanyşyň",
+                btnText: "Doly Maglumat",
+                callBtn: "Jaň etmek +993 71 305949",
+                engine: "Dwigatel",
+                trans: "Karobka",
+                drive: "Sürüjilik",
+                color: "Rengi",
+                year: "Ýyly"
+            }
+        };
+
+        function renderGrid() {
+            var grid = document.getElementById('carGrid');
+            if (!grid) return;
+            grid.innerHTML = '';
+            for (var i = 0; i < cars.length; i++) {
+                (function(car) {
+                    var card = document.createElement('div');
+                    card.className = 'card';
+                    card.onclick = function() { openModal(car.id); };
+
+                    var img = document.createElement('img');
+                    img.src = car.img;
+                    img.alt = car.name;
+                    img.className = 'card-img';
+
+                    var body = document.createElement('div');
+                    body.className = 'card-body';
+
+                    var title = document.createElement('div');
+                    title.className = 'card-title';
+                    title.innerText = car.name;
+
+                    var sub = document.createElement('div');
+                    sub.className = 'card-sub';
+                    sub.innerText = car.model + ' • ' + car.year;
+
+                    var btn = document.createElement('button');
+                    btn.className = 'btn-details';
+                    btn.innerText = translations[currentLang].btnText;
+
+                    body.appendChild(title);
+                    body.appendChild(sub);
+                    body.appendChild(btn);
+
+                    card.appendChild(img);
+                    card.appendChild(body);
+
+                    grid.appendChild(card);
+                })(cars[i]);
+            }
+        }
+
+        function toggleLanguage() {
+            currentLang = (currentLang === 'en') ? 'tm' : 'en';
+            document.getElementById('langBtn').innerText = (currentLang === 'en') ? 'TM' : 'EN';
+
+            var t = translations[currentLang];
+            document.getElementById('heroTitle').innerText = t.heroTitle;
+            document.getElementById('heroSub').innerText = t.heroSub;
+
+            renderGrid();
+        }
+
+        function openModal(id) {
+            var car = null;
+            for (var i = 0; i < cars.length; i++) {
+                if (cars[i].id === id) {
+                    car = cars[i];
+                    break;
+                }
+            }
+            if (!car) return;
+
+            var t = translations[currentLang];
+
+            document.getElementById('modalImg').src = car.img;
+            document.getElementById('modalTitle').innerText = car.name + ' (' + car.model + ')';
+            document.getElementById('modalDesc').innerText = (currentLang === 'en') ? car.desc_en : car.desc_tm;
+            document.getElementById('contactBtn').innerText = t.callBtn;
+
+            var specsContainer = document.getElementById('modalSpecs');
+            specsContainer.innerHTML = '';
+
+            var specList = [
+                { label: t.year, val: car.year },
+                { label: t.engine, val: car.specs.engine },
+                { label: t.trans, val: car.specs.transmission },
+                { label: t.drive, val: car.specs.drive },
+                { label: t.color, val: car.specs.color }
+            ];
+
+            for (var j = 0; j < specList.length; j++) {
+                var item = specList[j];
+                var row = document.createElement('div');
+                row.className = 'spec-item';
+
+                var lbl = document.createElement('span');
+                lbl.className = 'spec-label';
+                lbl.innerText = item.label + ':';
+                var val = document.createElement('span');
+                val.className = 'spec-val';
+                val.innerText = item.val;
+
+                row.appendChild(lbl);
+                row.appendChild(val);
+                specsContainer.appendChild(row);
+            }
+
+            document.getElementById('carModal').style.display = 'flex';
+        }
+
+        function closeModal() {
+            document.getElementById('carModal').style.display = 'none';
+        }
+
+        window.onload = function() {
+            renderGrid();
+        };
+    </script>
+</body>
+</html>
